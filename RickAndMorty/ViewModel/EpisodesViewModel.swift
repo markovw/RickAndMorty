@@ -47,7 +47,6 @@ class EpisodesViewModel {
                     }
                 } receiveValue: { [weak self] character in
                     self?.episodeImages.append(character)
-                    
 //                    print("Received Character object:")
 //                    print("Name: \(character.name)")
 //                    print("Image URL: \(character.image)")
@@ -57,9 +56,4 @@ class EpisodesViewModel {
             
         }
     }
-    
-    func getCharacterImages() -> [Character] {
-        return episodeImages
-    }
-    
 }

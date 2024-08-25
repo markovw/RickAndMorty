@@ -12,34 +12,76 @@ import Kingfisher
 
 class EpisodesViewController: UIViewController {
     
-    var collectionView: UICollectionView!
+    private var collectionView: UICollectionView!
+    private var topContainerView: UIView!
+    private var textField: UITextField!
+    private var searchButton: UIButton!
+    private var filterButton: UIButton!
+    private var cancellables = Set<AnyCancellable>()
     var viewModel: EpisodesViewModel = EpisodesViewModel()
-    var cancellables = Set<AnyCancellable>()
     
     required init?(coder: NSCoder) {
         self.viewModel = EpisodesViewModel()
         super.init(coder: coder)
     }
     
-    var logoImage: UIImageView = {
-        let logoImage = UIImageView(frame: CGRect(x: 0, y: 0, width: 312, height: 104))
-        logoImage.contentMode = .scaleAspectFill
-        logoImage.clipsToBounds = true
-//        logoImage.translatesAutoresizingMaskIntoConstraints = false
-
-        logoImage.image = UIImage(named: "logoImage")
-        return logoImage
-
-    }()
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        setupTopContainerView()
         setupCollectionView()
         bindViewModel()
         viewModel.loadEpisodes()
         
-
+    }
+    
+    private func setupTopContainerView() {
+        topContainerView = UIView()
+        topContainerView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(topContainerView)
+        
+        let textField: UITextField = {
+            let textField = UITextField()
+            textField.placeholder = "Name or episode (ex.S01E01)..."
+            textField.borderStyle = .roundedRect
+            textField.translatesAutoresizingMaskIntoConstraints = false
+            topContainerView.addSubview(textField)
+            return textField
+        }()
+        
+        let filterButton: UIButton = {
+            let filterButton = UIButton(type: .system)
+            filterButton.setTitle("ADVANCED FILTERS", for: .normal)
+            filterButton.tintColor = .textButton
+            filterButton.backgroundColor = .filterButton
+            filterButton.titleLabel?.font = .systemFont(ofSize: 14, weight: .medium)
+            filterButton.layer.cornerRadius = 4
+            filterButton.translatesAutoresizingMaskIntoConstraints = false
+            topContainerView.addSubview(filterButton)
+            return filterButton
+        }()
+        
+        // container constraints
+        NSLayoutConstraint.activate([
+            topContainerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            topContainerView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            topContainerView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16)
+        ])
+        
+        // container elements constraints
+        NSLayoutConstraint.activate([
+            textField.topAnchor.constraint(equalTo: topContainerView.topAnchor),
+            textField.leadingAnchor.constraint(equalTo: topContainerView.leadingAnchor),
+            textField.trailingAnchor.constraint(equalTo: topContainerView.trailingAnchor),
+            textField.heightAnchor.constraint(equalToConstant: 40),
+            
+            filterButton.topAnchor.constraint(equalTo: textField.bottomAnchor, constant: 8),
+            filterButton.leadingAnchor.constraint(equalTo: topContainerView.leadingAnchor),
+            filterButton.trailingAnchor.constraint(equalTo: topContainerView.trailingAnchor),
+            filterButton.heightAnchor.constraint(equalToConstant: 56),
+            
+            filterButton.bottomAnchor.constraint(equalTo: topContainerView.bottomAnchor)
+        ])
     }
     
     private func setupCollectionView() {
@@ -49,17 +91,21 @@ class EpisodesViewController: UIViewController {
         layout.minimumInteritemSpacing = 55
         layout.minimumLineSpacing = 55
         
-        collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: layout)
+        collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .white
         collectionView.register(EpisodeCellView.self, forCellWithReuseIdentifier: "episode")
         collectionView.delegate = self
         collectionView.dataSource = self
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
         
-        collectionView.contentInset = UIEdgeInsets(top: 380, left: 0, bottom: 0, right: 0)
-        
-
         view.addSubview(collectionView)
         
+        NSLayoutConstraint.activate([
+            collectionView.topAnchor.constraint(equalTo: topContainerView.bottomAnchor, constant: 16),
+            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
     }
     
     private func bindViewModel() {

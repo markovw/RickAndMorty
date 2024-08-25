@@ -38,7 +38,7 @@ final class NetworkManager {
     }
 }
 
-class CharacterFetcher {
+final class CharacterFetcher {
     private var cancellables = Set<AnyCancellable>()
     
     func fetchRandomCharacterImage(for characterURL: [String]) -> AnyPublisher<Character, Error> {
