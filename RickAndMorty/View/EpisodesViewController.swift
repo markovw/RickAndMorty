@@ -11,7 +11,6 @@ import Combine
 import Kingfisher
 
 class EpisodesViewController: UIViewController {
-    
     private var collectionView: UICollectionView!
     private var topContainerView: UIView!
     private var textField: UITextField!
@@ -19,12 +18,7 @@ class EpisodesViewController: UIViewController {
     private var filterButton: UIButton!
     private var cancellables = Set<AnyCancellable>()
     var viewModel: EpisodesViewModel = EpisodesViewModel()
-    
-    required init?(coder: NSCoder) {
-        self.viewModel = EpisodesViewModel()
-        super.init(coder: coder)
-    }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -64,8 +58,8 @@ class EpisodesViewController: UIViewController {
         // container constraints
         NSLayoutConstraint.activate([
             topContainerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            topContainerView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            topContainerView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16)
+            topContainerView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 40),
+            topContainerView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -40)
         ])
         
         // container elements constraints
@@ -91,7 +85,7 @@ class EpisodesViewController: UIViewController {
         layout.minimumInteritemSpacing = 55
         layout.minimumLineSpacing = 55
         
-        collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: layout)
         collectionView.backgroundColor = .white
         collectionView.register(EpisodeCellView.self, forCellWithReuseIdentifier: "episode")
         collectionView.delegate = self

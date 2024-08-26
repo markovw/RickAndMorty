@@ -16,7 +16,6 @@ class EpisodesViewModel {
     private var characterFetcher: CharacterFetcher = CharacterFetcher()
     var cancellables = Set<AnyCancellable>()
     
-    
     func loadEpisodes() {
         networkManager.loadData()
             .receive(on: DispatchQueue.main)
@@ -32,7 +31,6 @@ class EpisodesViewModel {
                 self?.fetchCharacterInfo()
             })
             .store(in: &cancellables)
-        
     }
     
     func fetchCharacterInfo() {
@@ -53,7 +51,6 @@ class EpisodesViewModel {
 //                    print("Species: \(character.species)")
                 }
                 .store(in: &cancellables)
-            
         }
     }
 }
