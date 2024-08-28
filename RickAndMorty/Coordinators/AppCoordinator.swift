@@ -11,13 +11,17 @@ import UIKit
 class AppCoordinator: Coordinator {
     
     let window: UIWindow
+
     
     init(window: UIWindow) {
         self.window = window
     }
     
     func start() {
-        window.rootViewController = EpisodesViewController()
+        let viewModel = EpisodesViewModel()
+        let episodesViewController = EpisodesViewController(viewModel: viewModel)
+        
+        window.rootViewController = episodesViewController
         window.backgroundColor = .white
     }
 }
