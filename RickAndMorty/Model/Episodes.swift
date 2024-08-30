@@ -39,3 +39,4 @@ struct EpisodeResponse: Codable {
     let info: Info
     let results: [Result]
 }
+

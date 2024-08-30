@@ -6,9 +6,28 @@
 //
 
 import Foundation
+import UIKit
 
 final class OnboardingCoordinator: Coordinator {
-    func start() {
-
+    
+    var childCoordinators: [Coordinator] = []
+    var navigationController: UINavigationController
+    
+    var onFinish: (() -> Void)?
+    
+    init(_ navigationController: UINavigationController) {
+        self.navigationController = navigationController
     }
+    
+    func start() {
+        let onboardingViewController = OnboardingViewController()
+        onboardingViewController.coordinator = self
+        
+        navigationController.pushViewController(onboardingViewController, animated: false)
+    }
+    
+    func showEpisodes() {
+        onFinish?()
+    }
+
 }

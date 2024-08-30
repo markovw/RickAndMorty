@@ -15,7 +15,6 @@ final class NetworkManager {
             return Fail(error: NetworkError.invalidURL)
                 .eraseToAnyPublisher()
         }
-        
         return URLSession.shared.dataTaskPublisher(for: url)
             .tryMap { data, response in
                 // Проверка статуса HTTP ответа
@@ -47,7 +46,6 @@ final class CharacterFetcher {
             return Fail(error: NetworkError.invalidURL).eraseToAnyPublisher()
         }
         print(url)
-        
         return URLSession.shared.dataTaskPublisher(for: url)
             .tryMap { data, response in
                 guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
@@ -59,4 +57,3 @@ final class CharacterFetcher {
             .eraseToAnyPublisher()
     }
 }
-

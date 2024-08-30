@@ -33,7 +33,7 @@ class EpisodesViewModel {
             .store(in: &cancellables)
     }
     
-    func fetchCharacterInfo() {
+    private func fetchCharacterInfo() {
         for episode in episodes {
             characterFetcher.fetchRandomCharacterImage(for: episode.characters)
                 .sink { completion in

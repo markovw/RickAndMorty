@@ -6,7 +6,15 @@
 //
 
 import Foundation
+import UIKit
 
-protocol Coordinator {
+enum CoordinatorType {
+    case app, launch, onboarding, page
+}
+
+protocol Coordinator: AnyObject {
+    var childCoordinators: [Coordinator] { get set }
+    var navigationController: UINavigationController { get set }
+    
     func start()
 }

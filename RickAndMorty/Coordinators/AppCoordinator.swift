@@ -5,23 +5,40 @@
 //  Created by Vladislav on 26.08.2024.
 //
 
-import Foundation
 import UIKit
 
-class AppCoordinator: Coordinator {
+final class AppCoordinator: Coordinator {
+    var navigationController: UINavigationController
+    var childCoordinators = [Coordinator]()
     
     let window: UIWindow
+    private var tabBarCoordinator: TabBarCoordinator?
 
-    
-    init(window: UIWindow) {
+    required init(window: UIWindow, _ navigationController: UINavigationController) {
         self.window = window
+        self.navigationController = navigationController
     }
     
     func start() {
-        let viewModel = EpisodesViewModel()
-        let episodesViewController = EpisodesViewController(viewModel: viewModel)
+        let onboardingCoordinator = OnboardingCoordinator(navigationController)
+        childCoordinators.append(onboardingCoordinator)
+        onboardingCoordinator.onFinish = { [weak self] in
+            self?.showMainApp()
+        }
+        onboardingCoordinator.start()
         
-        window.rootViewController = episodesViewController
+        window.rootViewController = navigationController
         window.backgroundColor = .white
+        window.makeKeyAndVisible()
+    }
+    
+    private func showMainApp() {
+        let tabBarCoordinator = TabBarCoordinator(navigationController)
+        self.tabBarCoordinator = tabBarCoordinator
+        childCoordinators.append(tabBarCoordinator)
+        tabBarCoordinator.start()
     }
 }
+
+
+
