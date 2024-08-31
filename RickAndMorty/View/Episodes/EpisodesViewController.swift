@@ -14,14 +14,18 @@ class EpisodesViewController: UIViewController, UICollectionViewDelegate {
     private var cancellables = Set<AnyCancellable>()
     var viewModel = EpisodesViewModel()
     
-    // MARK: Lifecycle
+    // MARK: – Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setupEpisodesView()
         bindViewModel()
         viewModel.loadEpisodes()
-        
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        collectionView.reloadData()
     }
 }
 
@@ -52,7 +56,7 @@ private extension EpisodesViewController {
     }
 }
 
-extension EpisodesViewController: UICollectionViewDataSource {
+extension EpisodesViewController: UICollectionViewDataSource, EpisodesCellViewDelegate {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 2
     }
@@ -62,8 +66,7 @@ extension EpisodesViewController: UICollectionViewDataSource {
         return section == 0 ? 1 : viewModel.episodes.count
     }
     
-    func collectionView(_ collectionView: UICollectionView,
-                        cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if indexPath.section == 0 {
             // MARK: TopBarSection
             guard let cell = collectionView.dequeueReusableCell(
@@ -72,7 +75,7 @@ extension EpisodesViewController: UICollectionViewDataSource {
             ) as? EpisodesHeaderView else {
                 fatalError("Unable to dequeue HeaderCellView")
             }
-            // customizing elements
+            // Customizing elements
             cell.logoImageView.image = UIImage(named: "logoImage")
             cell.searchTextField.placeholder = "Name or episode (ex. S01E01)"
             cell.filterButton.setTitle("ADVANCED FILTERS", for: .normal)
@@ -86,43 +89,60 @@ extension EpisodesViewController: UICollectionViewDataSource {
                 fatalError("Unable to dequeue EpisodeCellView")
             }
             
-            let episode = viewModel.episodes[indexPath.row]
-            // text
-            cell.episodeTitle.text = "\(episode.name) | \(episode.episode)"
-            cell.episodeIcon.image = UIImage(named: "playIcon")
-            // image + text
-            if indexPath.row < viewModel.episodeImages.count {
-                let character = viewModel.episodeImages[indexPath.row]
-                cell.characterName.text = character.name
-                let url = URL(string: character.image)
-                cell.episodeImage.kf.setImage(
-                    with: url,
-                    placeholder: UIImage(named: "placeholder"),
-                    options: [
-                        .transition(.fade(0.2)),
-                        .cacheOriginalImage
-                    ]
-                )
-            } else {
-                cell.characterName.text = "Loading..."
-                cell.episodeImage.image = UIImage(named: "placeholder")
+            guard indexPath.row < viewModel.episodes.count else {
+                fatalError("Index out of range for episodes array")
             }
+            let episode = viewModel.episodes[indexPath.row]
+            
+            guard indexPath.row < viewModel.episodeImages.count else {
+                let placeholderCharacter = Character(image: "placeholder", name: "Loading..", species: "")
+                cell.characterName.text = placeholderCharacter.name
+                cell.episodeImage.image = UIImage(named: "placeholder")
+                cell.configure(with: episode, with: placeholderCharacter, isFavorite: FavoritesManager.shared.isFavorite(episode.id))
+                cell.delegate = self
+                return cell
+            }
+            
+            let character = viewModel.episodeImages[indexPath.row]
+            let isFavorite = FavoritesManager.shared.isFavorite(episode.id)
+            
+            cell.characterName.text = character.name
+            let url = URL(string: character.image)
+            cell.episodeImage.kf.setImage(
+                with: url,
+                placeholder: UIImage(named: "placeholder"),
+                options: [
+                    .transition(.fade(0.2)),
+                    .cacheOriginalImage
+                ]
+            )
+            
+            cell.configure(with: episode, with: character, isFavorite: isFavorite)
+            cell.delegate = self
+            
             return cell
         }
     }
     // MARK: Adding to Favorites
-    func collectionView(_ collectionView: UICollectionView,
-                        didSelectItemAt indexPath: IndexPath) {
-        if indexPath.section == 1 {
+    func didTapFavoriteButton(in cell: EpisodesCellView) {
+        if let indexPath = collectionView.indexPath(for: cell) {
             let selectedEpisode = viewModel.episodes[indexPath.row]
             let selectedImage = viewModel.episodeImages[indexPath.row]
+            let favorite = FavoriteEpisodes(episode: selectedEpisode, character: selectedImage)
+            let isCurrentlyFavorite = FavoritesManager.shared.isFavorite(selectedEpisode.id)
             
-            let favorite = FavoriteEpisodes(episode: selectedEpisode,
-                                            character: selectedImage)
-            print(favorite)
-
-            // add to favorites list
-            FavoritesManager.shared.addFavorite(favorite)
+            if isCurrentlyFavorite {
+                FavoritesManager.shared.removeFavorite(by: favorite.episode.id)
+            } else {
+                // Если эпизод не в избранном, добавляем его
+                FavoritesManager.shared.addFavorite(favorite)
+                
+                let alert = UIAlertController(title: "Success", message: "Added \(selectedImage.name) to Favorites!", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+                self.present(alert, animated: true, completion: nil)
+            }
+            cell.updateFavoriteButton(isFavorite: !isCurrentlyFavorite)
+            collectionView.reloadData()
         }
     }
 }

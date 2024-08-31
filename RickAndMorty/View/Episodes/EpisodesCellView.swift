@@ -11,6 +11,7 @@ import Combine
 final class EpisodesCellView: UICollectionViewCell, UICollectionViewDelegate {
     var episode: Result?
     private var cancellables = Set<AnyCancellable>()
+    weak var delegate: EpisodesCellViewDelegate?
     
     let episodeImage: UIImageView = {
         let imageView = UIImageView(frame: CGRect(x: 0, y: 0,
@@ -32,8 +33,10 @@ final class EpisodesCellView: UICollectionViewCell, UICollectionViewDelegate {
         let button = UIButton()
         button.setImage(UIImage(named: "heartIcon"), for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(didTapFavoriteButton), for: .touchUpInside)
         return button
     }()
+    
     let characterName: UILabel = {
         let label = UILabel()
         label.textAlignment = .left
@@ -90,30 +93,26 @@ final class EpisodesCellView: UICollectionViewCell, UICollectionViewDelegate {
         fatalError("init(coder:) has not been implemented")
     }
     
-    // MARK: Configure Favorites View
-    func configure(with episode: Result, with image: Character, isFavorite: Bool) {
-        episodeIcon.image = UIImage(named: "playIcon")
-        episodeTitle.text = "\(episode.name) | \(episode.episode)"
-        characterName.text = image.name
-        updateFavoriteButton(isFavorite: isFavorite)
-        
-        if let imageURL = URL(string: episode.characters.first ?? "") {
-            episodeImage.kf.setImage(
-                with: imageURL,
-                placeholder: UIImage(named: "placeholder"),
-                options: [
-                    .transition(.fade(0.2)),
-                    .cacheOriginalImage
-                ]
-            )
-        } else {
-            episodeImage.image = UIImage(named: "placeholder")
-        }
+    @objc private func didTapFavoriteButton() {
+        delegate?.didTapFavoriteButton(in: self)
+        updateFavoriteButton(isFavorite: true)
     }
     
-    private func updateFavoriteButton(isFavorite: Bool) {
+    // MARK: Configure Favorites View
+    func configure(with episode: Result, with character: Character, isFavorite: Bool) {
+        episodeIcon.image = UIImage(named: "playIcon")
+        episodeTitle.text = "\(episode.name) | \(episode.episode)"
+        characterName.text = character.name
+        updateFavoriteButton(isFavorite: isFavorite)
+
+    }
+    
+    func updateFavoriteButton(isFavorite: Bool) {
         let image = isFavorite ? UIImage(named: "heartIconFill") : UIImage(named: "heartIcon")
         heartButton.setImage(image, for: .normal)
     }
-    
+}
+
+protocol EpisodesCellViewDelegate: AnyObject {
+    func didTapFavoriteButton(in cell: EpisodesCellView)
 }

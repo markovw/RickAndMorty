@@ -4,12 +4,14 @@ import Combine
 class FavoritesManager {
     static let shared = FavoritesManager()
     
-    private(set) var favoriteEpisodes: [FavoriteEpisodes] = []
+    var favoriteEpisodes: [FavoriteEpisodes] = []
     
     private init() {}
     
     func addFavorite(_ favorite: FavoriteEpisodes) {
-        favoriteEpisodes.append(favorite)
+        if !isFavorite(favorite.episode.id) {
+            favoriteEpisodes.insert(favorite, at: 0)
+        }
     }
     
     func removeFavorite(by id: Int) {

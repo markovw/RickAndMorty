@@ -9,5 +9,4 @@ import Foundation
 import Combine
 
 class FavoritesViewModel {
-    @Published var favoriteEpisodes: [Result] = []
 }

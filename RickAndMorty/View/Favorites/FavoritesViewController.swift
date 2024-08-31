@@ -10,13 +10,23 @@ import Kingfisher
 
 class FavoritesViewController: UIViewController {
     private var collectionView: UICollectionView!
+    private lazy var favorites: [FavoriteEpisodes] = []
     
-    var favorites: [FavoriteEpisodes] = []
+    let titleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Favorites episodes"
+        label.font = UIFont.boldSystemFont(ofSize: 24)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
     
+    // MARK: – Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        view.addSubview(titleLabel) 
         setupCollectionView()
+        setupConstraints()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -38,9 +48,14 @@ class FavoritesViewController: UIViewController {
         collectionView.dataSource = self
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(collectionView)
-        
+    }
+    
+    private func setupConstraints() {
         NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: view.topAnchor),
+            titleLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            
+            collectionView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 20),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
@@ -48,39 +63,23 @@ class FavoritesViewController: UIViewController {
     }
 }
 
-extension FavoritesViewController: UICollectionViewDelegate {}
 
-
-extension FavoritesViewController: UICollectionViewDataSource {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return FavoritesManager.shared.favoriteEpisodes.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "episode", for: indexPath) as? EpisodesCellView else {
-            fatalError("Unable to dequeue EpisodesCellView")
-        }
-        
+extension FavoritesViewController: EpisodesCellViewDelegate {
+    func didTapFavoriteButton(in cell: EpisodesCellView) {
+        guard let indexPath = collectionView.indexPath(for: cell) else { return }
         let favorite = FavoritesManager.shared.favoriteEpisodes[indexPath.item]
-        let episode = favorite.episode
-        let character = favorite.character
         
-        let isFavorite = FavoritesManager.shared.isFavorite(episode.id)
-        cell.configure(with: episode, with: character, isFavorite: isFavorite)
+        // Удаляем элемент из избранного
+        FavoritesManager.shared.removeFavorite(by: favorite.episode.id)
         
-        if let characterURL = URL(string: character.image) {
-            cell.episodeImage.kf.setImage(
-                with: characterURL,
-                placeholder: UIImage(named: "placeholder"),
-                options: [
-                    .transition(.fade(0.2)),
-                    .cacheOriginalImage
-                ]
-            )
-        } else {
-            cell.episodeImage.image = UIImage(named: "placeholder")
-        }
-        
-        return cell
+        // Обновляем collectionView
+        collectionView.performBatchUpdates({
+            collectionView.deleteItems(at: [indexPath])
+        }, completion: { _ in
+            // Optionally, show a confirmation or refresh UI
+        })
     }
 }
+
+
+

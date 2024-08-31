@@ -34,6 +34,7 @@ class TabBarCoordinator: Coordinator {
         
         tabBarController.viewControllers = [espisodesNavController, favoritesNavController]
         navigationController.setViewControllers([tabBarController], animated: true)
+        navigationController.setNavigationBarHidden(true, animated: false)
     }
 }
 

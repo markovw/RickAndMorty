@@ -27,6 +27,10 @@ final class EpisodesHeaderView: UICollectionViewCell {
         filterButton.titleLabel?.font = .systemFont(ofSize: 14, weight: .medium)
         filterButton.layer.cornerRadius = 4
         filterButton.translatesAutoresizingMaskIntoConstraints = false
+        filterButton.layer.shadowColor = UIColor.black.cgColor
+        filterButton.layer.shadowOpacity = 0.24
+        filterButton.layer.shadowOffset = CGSize(width: 0, height: 2)
+        filterButton.layer.shadowRadius = 2
         return filterButton
     }()
     
