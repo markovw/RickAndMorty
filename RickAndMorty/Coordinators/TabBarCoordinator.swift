@@ -31,7 +31,6 @@ class TabBarCoordinator: Coordinator {
                                                           image: UIImage(systemName: "heart"),
                                                           selectedImage: UIImage(systemName: "heart.fill"))
         
-        
         tabBarController.viewControllers = [espisodesNavController, favoritesNavController]
         navigationController.setViewControllers([tabBarController], animated: true)
         navigationController.setNavigationBarHidden(true, animated: false)

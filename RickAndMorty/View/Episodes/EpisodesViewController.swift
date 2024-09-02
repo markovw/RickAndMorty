@@ -30,6 +30,23 @@ class EpisodesViewController: UIViewController, UICollectionViewDelegate {
 }
 
 private extension EpisodesViewController {
+    internal func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if indexPath.section == 1 { // Проверьте, что это секция с эпизодами
+            let episode = viewModel.episodes[indexPath.row]
+            let character = viewModel.episodeImages[indexPath.row]
+
+            // Создайте экземпляр DetailViewController
+            let detailViewController = DetailViewController()
+            detailViewController.episode = episode
+            detailViewController.character = character
+
+            // Переход к DetailViewController
+            navigationController?.pushViewController(detailViewController, animated: true)
+        }
+    }
+}
+
+private extension EpisodesViewController {
     private func setupEpisodesView() {
         let layout = UICollectionViewFlowLayout()
         layout.itemSize = CGSize(width: 311, height: 357)
@@ -95,7 +112,19 @@ extension EpisodesViewController: UICollectionViewDataSource, EpisodesCellViewDe
             let episode = viewModel.episodes[indexPath.row]
             
             guard indexPath.row < viewModel.episodeImages.count else {
-                let placeholderCharacter = Character(image: "placeholder", name: "Loading..", species: "")
+                let placeholderLocation = Location(name: "Unknown")
+                let placeholderOrigin = Origin(name: "Unknown")
+                
+                let placeholderCharacter = Character(
+                    image: "placeholder",
+                    name: "Loading..",
+                    status: "Loading..",
+                    species: "Loading..",
+                    gender: "Loading..",
+                    location: placeholderLocation,
+                    origin: placeholderOrigin,
+                    type: "Loading.."
+                )
                 cell.characterName.text = placeholderCharacter.name
                 cell.episodeImage.image = UIImage(named: "placeholder")
                 cell.configure(with: episode, with: placeholderCharacter, isFavorite: FavoritesManager.shared.isFavorite(episode.id))
@@ -146,3 +175,4 @@ extension EpisodesViewController: UICollectionViewDataSource, EpisodesCellViewDe
         }
     }
 }
+

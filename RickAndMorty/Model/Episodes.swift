@@ -29,10 +29,23 @@ struct Result: Codable, Identifiable {
     }
 }
 
+struct Location: Codable {
+    let name: String
+}
+
+struct Origin: Codable {
+    let name: String
+}
+
 struct Character: Codable {
     let image: String
     let name: String
+    let status: String
     let species: String
+    let gender: String
+    let location: Location
+    let origin: Origin
+    let type: String
 }
 
 struct EpisodeResponse: Codable {

@@ -44,5 +44,14 @@ extension FavoritesViewController: UICollectionViewDataSource {
 }
 
 extension FavoritesViewController: UICollectionViewDelegate {
-    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let favorite = FavoritesManager.shared.favoriteEpisodes[indexPath.item]
+        let detailViewController = DetailViewController()
+        
+        detailViewController.episode = favorite.episode
+        detailViewController.character = favorite.character
+
+        navigationController?.pushViewController(detailViewController, animated: true)
+    }
 }
+

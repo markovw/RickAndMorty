@@ -63,20 +63,15 @@ class FavoritesViewController: UIViewController {
     }
 }
 
-
 extension FavoritesViewController: EpisodesCellViewDelegate {
     func didTapFavoriteButton(in cell: EpisodesCellView) {
         guard let indexPath = collectionView.indexPath(for: cell) else { return }
         let favorite = FavoritesManager.shared.favoriteEpisodes[indexPath.item]
         
-        // Удаляем элемент из избранного
         FavoritesManager.shared.removeFavorite(by: favorite.episode.id)
         
-        // Обновляем collectionView
         collectionView.performBatchUpdates({
             collectionView.deleteItems(at: [indexPath])
-        }, completion: { _ in
-            // Optionally, show a confirmation or refresh UI
         })
     }
 }
