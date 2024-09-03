@@ -20,7 +20,6 @@ extension FavoritesViewController: UICollectionViewDataSource {
         let favorite = FavoritesManager.shared.favoriteEpisodes[indexPath.item]
         let episode = favorite.episode
         let character = favorite.character
-        
         let isFavorite = FavoritesManager.shared.isFavorite(episode.id)
         cell.configure(with: episode, with: character, isFavorite: isFavorite)
         
@@ -36,9 +35,7 @@ extension FavoritesViewController: UICollectionViewDataSource {
         } else {
             cell.episodeImage.image = UIImage(named: "placeholder")
         }
-        
         cell.delegate = self
-        
         return cell
     }
 }
@@ -46,12 +43,7 @@ extension FavoritesViewController: UICollectionViewDataSource {
 extension FavoritesViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let favorite = FavoritesManager.shared.favoriteEpisodes[indexPath.item]
-        let detailViewController = DetailViewController()
-        
-        detailViewController.episode = favorite.episode
-        detailViewController.character = favorite.character
-
-        navigationController?.pushViewController(detailViewController, animated: true)
+        coordinator?.showDetail(for: favorite.episode, character: favorite.character)
     }
 }
 

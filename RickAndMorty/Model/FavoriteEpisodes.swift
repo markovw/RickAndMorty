@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct FavoriteEpisodes {
+struct FavoriteEpisodes: Codable {
     let episode: Result
     let character: Character
 }

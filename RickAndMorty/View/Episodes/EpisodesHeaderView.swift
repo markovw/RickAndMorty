@@ -9,6 +9,8 @@ import Foundation
 import UIKit
 
 final class EpisodesHeaderView: UICollectionViewCell {
+    weak var delegate: EpisodesHeaderViewDelegate?
+    
     let logoImageView = UIImageView()
     let searchTextField: UITextField = {
         let textField = UITextField()
@@ -42,6 +44,9 @@ final class EpisodesHeaderView: UICollectionViewCell {
         logoImageView.translatesAutoresizingMaskIntoConstraints = false
         searchTextField.translatesAutoresizingMaskIntoConstraints = false
         filterButton.translatesAutoresizingMaskIntoConstraints = false
+        
+        searchTextField.addTarget(self, action: #selector(searchTextDidChange), for: .editingChanged)
+        
         NSLayoutConstraint.activate([
             // logo
             logoImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20),
@@ -62,5 +67,12 @@ final class EpisodesHeaderView: UICollectionViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    @objc private func searchTextDidChange() {
+        delegate?.didUpdateSearchText(searchTextField.text ?? "")
+    }
 }
 
+protocol EpisodesHeaderViewDelegate: AnyObject {
+    func didUpdateSearchText(_ text: String)
+}

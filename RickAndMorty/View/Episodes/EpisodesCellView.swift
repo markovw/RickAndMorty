@@ -33,7 +33,6 @@ final class EpisodesCellView: UICollectionViewCell, UICollectionViewDelegate {
         let button = UIButton()
         button.setImage(UIImage(named: "heartIcon"), for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(didTapFavoriteButton), for: .touchUpInside)
         return button
     }()
     
@@ -69,6 +68,9 @@ final class EpisodesCellView: UICollectionViewCell, UICollectionViewDelegate {
         contentView.layer.shadowOpacity = 0.20
         contentView.layer.shadowOffset = CGSize(width: 0, height: 2)
         contentView.layer.shadowRadius = 4
+        
+        heartButton.addTarget(self, action: #selector(didTapFavoriteButton), for: .touchUpInside)
+
         // constraints
         NSLayoutConstraint.activate([
             episodeIcon.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 22),

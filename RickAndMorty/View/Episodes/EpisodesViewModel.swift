@@ -12,6 +12,13 @@ import UIKit
 class EpisodesViewModel {
     @Published var episodes: [Result] = []
     @Published var episodeImages: [Character] = []
+    @Published var filteredEpisodes: [Result] = []
+    @Published var searchText: String = "" {
+        didSet {
+            filterEpisodes()
+        }
+        
+    }
     private var networkManager: NetworkManager = NetworkManager()
     private var characterFetcher: CharacterFetcher = CharacterFetcher()
     var cancellables = Set<AnyCancellable>()
@@ -31,6 +38,7 @@ class EpisodesViewModel {
                 self?.fetchCharacterInfo()
             })
             .store(in: &cancellables)
+        filterEpisodes()
     }
     
     private func fetchCharacterInfo() {
@@ -45,12 +53,26 @@ class EpisodesViewModel {
                     }
                 } receiveValue: { [weak self] character in
                     self?.episodeImages.append(character)
-//                    print("Received Character object:")
-//                    print("Name: \(character.name)")
-//                    print("Image URL: \(character.image)")
-//                    print("Species: \(character.species)")
                 }
                 .store(in: &cancellables)
+        }
+    }
+    
+    func removeEpisode(at index: Int) {
+        if index >= 0 && index < episodes.count {
+            episodes.remove(at: index)
+            episodeImages.remove(at: index)
+        }
+    }
+    
+    private func filterEpisodes() {
+        if searchText.isEmpty {
+            filteredEpisodes = episodes
+        } else {
+            filteredEpisodes = episodes.filter { episode in
+                episode.name.lowercased().contains(searchText.lowercased()) ||
+                episode.episode.lowercased().contains(searchText.lowercased())
+            }
         }
     }
 }

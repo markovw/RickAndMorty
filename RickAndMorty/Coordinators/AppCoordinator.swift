@@ -13,7 +13,7 @@ final class AppCoordinator: Coordinator {
     
     let window: UIWindow
     private var tabBarCoordinator: TabBarCoordinator?
-
+    
     required init(window: UIWindow, _ navigationController: UINavigationController) {
         self.window = window
         self.navigationController = navigationController
@@ -33,10 +33,17 @@ final class AppCoordinator: Coordinator {
     }
     
     private func showMainApp() {
-        let tabBarCoordinator = TabBarCoordinator(navigationController)
+        let tabBarCoordinator = TabBarCoordinator(navigationController, appCoordinator: self)
         self.tabBarCoordinator = tabBarCoordinator
         childCoordinators.append(tabBarCoordinator)
         tabBarCoordinator.start()
+    }
+    
+    func showDetail(for episode: Result, character: Character) {
+        let detailViewController = DetailViewController()
+        detailViewController.episode = episode
+        detailViewController.character = character
+        navigationController.pushViewController(detailViewController, animated: true)   
     }
 }
 

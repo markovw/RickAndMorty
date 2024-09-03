@@ -9,16 +9,18 @@ import UIKit
 import Combine
 import Kingfisher
 
-class EpisodesViewController: UIViewController, UICollectionViewDelegate {
+class EpisodesViewController: UIViewController, UICollectionViewDelegate, EpisodesHeaderViewDelegate {
     private var collectionView: UICollectionView!
     private var cancellables = Set<AnyCancellable>()
-    var viewModel = EpisodesViewModel()
+    private var viewModel = EpisodesViewModel()
+    var coordinator: AppCoordinator?
     
     // MARK: – Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setupEpisodesView()
+        setupHeaderView()
         bindViewModel()
         viewModel.loadEpisodes()
     }
@@ -27,22 +29,14 @@ class EpisodesViewController: UIViewController, UICollectionViewDelegate {
         super.viewWillAppear(animated)
         collectionView.reloadData()
     }
-}
-
-private extension EpisodesViewController {
-    internal func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if indexPath.section == 1 { // Проверьте, что это секция с эпизодами
-            let episode = viewModel.episodes[indexPath.row]
-            let character = viewModel.episodeImages[indexPath.row]
-
-            // Создайте экземпляр DetailViewController
-            let detailViewController = DetailViewController()
-            detailViewController.episode = episode
-            detailViewController.character = character
-
-            // Переход к DetailViewController
-            navigationController?.pushViewController(detailViewController, animated: true)
-        }
+    
+    private func setupHeaderView() {
+        let headerView = EpisodesHeaderView()
+        headerView.delegate = self
+    }
+    
+    func didUpdateSearchText(_ text: String) {
+        viewModel.searchText = text
     }
 }
 
@@ -152,6 +146,17 @@ extension EpisodesViewController: UICollectionViewDataSource, EpisodesCellViewDe
             return cell
         }
     }
+    // MARK: Transition to DetailVC
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if indexPath.section == 1 {
+            let episode = viewModel.episodes[indexPath.row]
+            guard indexPath.row < viewModel.episodeImages.count else { return }
+            let character = viewModel.episodeImages[indexPath.row]
+            
+            coordinator?.showDetail(for: episode, character: character)
+        }
+    }
+    
     // MARK: Adding to Favorites
     func didTapFavoriteButton(in cell: EpisodesCellView) {
         if let indexPath = collectionView.indexPath(for: cell) {
@@ -163,7 +168,6 @@ extension EpisodesViewController: UICollectionViewDataSource, EpisodesCellViewDe
             if isCurrentlyFavorite {
                 FavoritesManager.shared.removeFavorite(by: favorite.episode.id)
             } else {
-                // Если эпизод не в избранном, добавляем его
                 FavoritesManager.shared.addFavorite(favorite)
                 
                 let alert = UIAlertController(title: "Success", message: "Added \(selectedImage.name) to Favorites!", preferredStyle: .alert)
@@ -174,5 +178,24 @@ extension EpisodesViewController: UICollectionViewDataSource, EpisodesCellViewDe
             collectionView.reloadData()
         }
     }
+    // MARK: Deleting the cell by swipe
+    func collectionView(_ collectionView: UICollectionView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let deleteAction = UIContextualAction(style: .destructive, title: "Удалить") { [weak self] (action, view, completionHandler) in
+            self?.deleteItem(at: indexPath)
+            completionHandler(true)
+        }
+        
+        let configuration = UISwipeActionsConfiguration(actions: [deleteAction])
+        configuration.performsFirstActionWithFullSwipe = true
+        return configuration
+    }
+    
+    private func deleteItem(at indexPath: IndexPath) {
+        viewModel.episodes.remove(at: indexPath.row)
+        viewModel.episodeImages.remove(at: indexPath.row)
+        
+        collectionView.deleteItems(at: [indexPath])
+    }
+
 }
 

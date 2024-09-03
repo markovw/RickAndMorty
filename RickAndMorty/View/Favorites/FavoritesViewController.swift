@@ -11,6 +11,7 @@ import Kingfisher
 class FavoritesViewController: UIViewController {
     private var collectionView: UICollectionView!
     private lazy var favorites: [FavoriteEpisodes] = []
+    var coordinator: AppCoordinator?
     
     let titleLabel: UILabel = {
         let label = UILabel()
@@ -23,7 +24,7 @@ class FavoritesViewController: UIViewController {
     // MARK: – Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         view.addSubview(titleLabel) 
         setupCollectionView()
         setupConstraints()

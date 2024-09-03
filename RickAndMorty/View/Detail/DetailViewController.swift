@@ -68,7 +68,6 @@ class DetailViewController: UIViewController, UITableViewDelegate, UITableViewDa
         button.contentMode = .scaleAspectFit
         button.tintColor = .black
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(imageSwitchTapped), for: .touchUpInside)
         return button
     }()
     
@@ -111,18 +110,17 @@ class DetailViewController: UIViewController, UITableViewDelegate, UITableViewDa
         
         self.navigationItem.hidesBackButton = true
         backButton.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
+        logoCamera.addTarget(self, action: #selector(imageSwitchTapped), for: .touchUpInside)
+
     }
     
     func createTable() {
         myTableView = UITableView(frame: view.bounds, style: .plain)
         myTableView.register(DetailTableViewCell.self, forCellReuseIdentifier: "InfoCell")
-        
         myTableView.delegate = self
         myTableView.dataSource = self
-        
         myTableView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         myTableView.translatesAutoresizingMaskIntoConstraints = false
-        
         view.addSubview(myTableView)
     }
     
@@ -160,7 +158,7 @@ class DetailViewController: UIViewController, UITableViewDelegate, UITableViewDa
             whiteRectangle.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             whiteRectangle.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             whiteRectangle.heightAnchor.constraint(equalToConstant: 60),
-            whiteRectangle.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: -35),
+            whiteRectangle.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0),
             
             backButton.leadingAnchor.constraint(equalTo: whiteRectangle.leadingAnchor, constant: 12),
             backButton.topAnchor.constraint(equalTo: whiteRectangle.topAnchor, constant: 18),
@@ -197,8 +195,12 @@ class DetailViewController: UIViewController, UITableViewDelegate, UITableViewDa
     @objc private func imageSwitchTapped() {
         let actionSheet = UIAlertController(title: "Upload an image", message: nil, preferredStyle: .actionSheet)
         
-        let action1 = UIAlertAction(title: "Camera", style: .default)
-        let action2 = UIAlertAction(title: "Gallery", style: .default)
+        let action1 = UIAlertAction(title: "Camera", style: .default) { [weak self] _ in
+            self?.openCamera()
+        }
+        let action2 = UIAlertAction(title: "Gallery", style: .default) { [weak self] _ in
+            self?.openGallery()
+        }
         let action3 = UIAlertAction(title: "Cancel", style: .cancel)
         
         actionSheet.addAction(action1)
@@ -206,6 +208,30 @@ class DetailViewController: UIViewController, UITableViewDelegate, UITableViewDa
         actionSheet.addAction(action3)
         
         present(actionSheet, animated: true, completion: nil)
+    }
+    
+    private func openCamera() {
+        if UIImagePickerController.isSourceTypeAvailable(.camera) {
+            let imagePicker = UIImagePickerController()
+            imagePicker.delegate = self
+            imagePicker.sourceType = .camera
+            imagePicker.allowsEditing = false
+            present(imagePicker, animated: true, completion: nil)
+        } else {
+            let alert = UIAlertController(title: "Error", message: "Camera not available", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+            present(alert, animated: true, completion: nil)
+        }
+    }
+    
+    private func openGallery() {
+        if UIImagePickerController.isSourceTypeAvailable(.photoLibrary) {
+            let imagePicker = UIImagePickerController()
+            imagePicker.delegate = self
+            imagePicker.sourceType = .photoLibrary
+            imagePicker.allowsEditing = false
+            present(imagePicker, animated: true, completion: nil)
+        }
     }
 }
 
@@ -236,5 +262,18 @@ extension DetailViewController {
 extension DetailViewController {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         64
+    }
+}
+
+extension DetailViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        if let pickedImage = info[.originalImage] as? UIImage {
+            circularImageView.image = pickedImage
+        }
+        dismiss(animated: true, completion: nil)
+    }
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        dismiss(animated: true, completion: nil)
     }
 }
