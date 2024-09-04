@@ -9,7 +9,7 @@ import UIKit
 import Combine
 import Kingfisher
 
-class EpisodesViewController: UIViewController, UICollectionViewDelegate, EpisodesHeaderViewDelegate {
+class EpisodesViewController: UIViewController, UICollectionViewDelegate {
     private var collectionView: UICollectionView!
     private var cancellables = Set<AnyCancellable>()
     private var viewModel = EpisodesViewModel()
@@ -20,7 +20,6 @@ class EpisodesViewController: UIViewController, UICollectionViewDelegate, Episod
         super.viewDidLoad()
         
         setupEpisodesView()
-        setupHeaderView()
         bindViewModel()
         viewModel.loadEpisodes()
     }
@@ -28,10 +27,6 @@ class EpisodesViewController: UIViewController, UICollectionViewDelegate, Episod
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         collectionView.reloadData()
-    }
-    
-    func didUpdateSearchText(_ text: String) {
-        viewModel.searchText = text
     }
 }
 
@@ -59,11 +54,6 @@ private extension EpisodesViewController {
                 self?.collectionView.reloadData()
             }
             .store(in: &cancellables)
-    }
-    
-    private func setupHeaderView() {
-        let headerView = EpisodesHeaderView()
-        headerView.delegate = self
     }
 }
 

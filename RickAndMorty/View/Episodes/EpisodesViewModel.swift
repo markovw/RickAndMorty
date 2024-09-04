@@ -12,13 +12,6 @@ import UIKit
 class EpisodesViewModel {
     @Published var episodes: [Result] = []
     @Published var episodeImages: [Character] = []
-    @Published var filteredEpisodes: [Result] = []
-    @Published var searchText: String = "" {
-        didSet {
-            filterEpisodes()
-        }
-        
-    }
     private var networkManager: NetworkManager = NetworkManager()
     private var characterFetcher: CharacterFetcher = CharacterFetcher()
     var cancellables = Set<AnyCancellable>()
@@ -38,7 +31,6 @@ class EpisodesViewModel {
                 self?.fetchCharacterInfo()
             })
             .store(in: &cancellables)
-        filterEpisodes()
     }
     
     private func fetchCharacterInfo() {
@@ -62,17 +54,6 @@ class EpisodesViewModel {
         if index >= 0 && index < episodes.count {
             episodes.remove(at: index)
             episodeImages.remove(at: index)
-        }
-    }
-    
-    private func filterEpisodes() {
-        if searchText.isEmpty {
-            filteredEpisodes = episodes
-        } else {
-            filteredEpisodes = episodes.filter { episode in
-                episode.name.lowercased().contains(searchText.lowercased()) ||
-                episode.episode.lowercased().contains(searchText.lowercased())
-            }
         }
     }
 }
