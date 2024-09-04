@@ -13,13 +13,20 @@ final class EpisodesHeaderView: UICollectionViewCell {
     
     let logoImageView = UIImageView()
     let searchTextField: UITextField = {
-        let textField = UITextField()
-        textField.placeholder = "Name or episode (ex.S01E01)..."
-        textField.backgroundColor = .white
-        textField.borderStyle = .roundedRect
-        textField.textColor = .textButton
-        textField.translatesAutoresizingMaskIntoConstraints = false
-        return textField
+        let tf = UITextField()
+        tf.backgroundColor = .white
+        tf.textColor = .textButton
+        tf.layer.borderWidth = 1
+        tf.leftImage(.magnifyingGlass.resize(to: CGSize(width: 24, height: 24)), imageWidth: 8, padding: 18)
+        tf.layer.borderColor = UIColor.darkGray.cgColor
+        tf.layer.cornerRadius = 10
+        tf.layer.masksToBounds = true
+        tf.attributedPlaceholder = NSAttributedString(
+            string: "Name or episode (ex.S01E01)...",
+            attributes: [NSAttributedString.Key.foregroundColor: UIColor.darkGray]
+        )
+        tf.translatesAutoresizingMaskIntoConstraints = false
+        return tf
     }()
     let filterButton: UIButton = {
         let filterButton = UIButton(type: .system)
@@ -56,7 +63,7 @@ final class EpisodesHeaderView: UICollectionViewCell {
             // searchbar
             searchTextField.topAnchor.constraint(equalTo: logoImageView.bottomAnchor, constant: 66),
             searchTextField.widthAnchor.constraint(equalToConstant: 312),
-            searchTextField.heightAnchor.constraint(equalToConstant: 40),
+            searchTextField.heightAnchor.constraint(equalToConstant: 56),
             // button
             filterButton.topAnchor.constraint(equalTo: searchTextField.bottomAnchor, constant: 13),
             filterButton.widthAnchor.constraint(equalToConstant: 312),

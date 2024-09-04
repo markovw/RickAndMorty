@@ -30,11 +30,6 @@ class EpisodesViewController: UIViewController, UICollectionViewDelegate, Episod
         collectionView.reloadData()
     }
     
-    private func setupHeaderView() {
-        let headerView = EpisodesHeaderView()
-        headerView.delegate = self
-    }
-    
     func didUpdateSearchText(_ text: String) {
         viewModel.searchText = text
     }
@@ -64,6 +59,11 @@ private extension EpisodesViewController {
                 self?.collectionView.reloadData()
             }
             .store(in: &cancellables)
+    }
+    
+    private func setupHeaderView() {
+        let headerView = EpisodesHeaderView()
+        headerView.delegate = self
     }
 }
 
@@ -180,7 +180,7 @@ extension EpisodesViewController: UICollectionViewDataSource, EpisodesCellViewDe
     }
     // MARK: Deleting the cell by swipe
     func collectionView(_ collectionView: UICollectionView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        let deleteAction = UIContextualAction(style: .destructive, title: "Удалить") { [weak self] (action, view, completionHandler) in
+        let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { [weak self] (action, view, completionHandler) in
             self?.deleteItem(at: indexPath)
             completionHandler(true)
         }
@@ -196,6 +196,5 @@ extension EpisodesViewController: UICollectionViewDataSource, EpisodesCellViewDe
         
         collectionView.deleteItems(at: [indexPath])
     }
-
 }
 

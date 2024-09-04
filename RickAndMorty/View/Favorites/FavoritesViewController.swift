@@ -65,6 +65,10 @@ class FavoritesViewController: UIViewController {
 }
 
 extension FavoritesViewController: EpisodesCellViewDelegate {
+    func didUpdateSearchText(_ text: String) {
+        
+    }
+    
     func didTapFavoriteButton(in cell: EpisodesCellView) {
         guard let indexPath = collectionView.indexPath(for: cell) else { return }
         let favorite = FavoritesManager.shared.favoriteEpisodes[indexPath.item]

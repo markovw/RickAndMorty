@@ -43,7 +43,8 @@ final class AppCoordinator: Coordinator {
         let detailViewController = DetailViewController()
         detailViewController.episode = episode
         detailViewController.character = character
-        navigationController.pushViewController(detailViewController, animated: true)   
+        navigationController.pushViewController(detailViewController, animated: true)
+        navigationController.interactivePopGestureRecognizer?.isEnabled = true
     }
 }
 

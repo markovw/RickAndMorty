@@ -88,7 +88,6 @@ final class EpisodesCellView: UICollectionViewCell, UICollectionViewDelegate {
             characterName.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             characterName.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -83)
         ])
-        
     }
     
     required init?(coder: NSCoder) {

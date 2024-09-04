@@ -131,8 +131,8 @@ class DetailViewController: UIViewController, UITableViewDelegate, UITableViewDa
             "Gender": character.gender,
             "Status": character.status,
             "Specie": character.species,
-            "Origin": character.origin.name,
-            "Type": character.type,
+            "Origin": character.origin.name.contains("unknown") ? "Unknown" : character.origin.name ,
+            "Type": character.type.isEmpty ? "Unknown" : character.type,
             "Location": character.location.name
         ]
     }
@@ -194,7 +194,6 @@ class DetailViewController: UIViewController, UITableViewDelegate, UITableViewDa
     
     @objc private func imageSwitchTapped() {
         let actionSheet = UIAlertController(title: "Upload an image", message: nil, preferredStyle: .actionSheet)
-        
         let action1 = UIAlertAction(title: "Camera", style: .default) { [weak self] _ in
             self?.openCamera()
         }
@@ -220,7 +219,7 @@ class DetailViewController: UIViewController, UITableViewDelegate, UITableViewDa
         } else {
             let alert = UIAlertController(title: "Error", message: "Camera not available", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-            present(alert, animated: true, completion: nil)
+            present(alert, animated: true)
         }
     }
     
@@ -231,6 +230,10 @@ class DetailViewController: UIViewController, UITableViewDelegate, UITableViewDa
             imagePicker.sourceType = .photoLibrary
             imagePicker.allowsEditing = false
             present(imagePicker, animated: true, completion: nil)
+        } else {
+            let alert = UIAlertController(title: "Error", message: "Photo library not available", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            present(alert, animated: true)
         }
     }
 }
@@ -247,7 +250,6 @@ extension DetailViewController {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "InfoCell", for: indexPath) as! DetailTableViewCell
-        
         let key = data[indexPath.section]
         let value = dataDictionary[key] ?? "N/A"
 
