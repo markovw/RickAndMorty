@@ -7,11 +7,12 @@
 
 import UIKit
 import Kingfisher
+import Combine
 
 class FavoritesViewController: UIViewController {
     private var collectionView: UICollectionView!
-    private var viewModel: FavoritesViewModel
-    var coordinator: AppCoordinator?
+    private var cancellables = Set<AnyCancellable>()
+    var viewModel: FavoritesViewModel
     
     init(viewModel: FavoritesViewModel) {
         self.viewModel = viewModel
@@ -30,18 +31,25 @@ class FavoritesViewController: UIViewController {
         return label
     }()
     
-    // MARK: – Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        view.addSubview(titleLabel) 
+        
+        view.addSubview(titleLabel)
         setupCollectionView()
         setupConstraints()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        collectionView.reloadData()
+        collectionView.delegate = self
+        
+        viewModel.$favoriteEpisodes
+            .sink { [weak self] _ in
+                self?.collectionView.reloadData()
+            }
+            .store(in: &cancellables)
+        viewModel.$selectedFavorite
+            .compactMap { $0 }
+            .sink { episode, character in
+                print("tapped esisode in favorites")
+            }
+            .store(in: &cancellables)
     }
     
     private func setupCollectionView() {
@@ -54,7 +62,6 @@ class FavoritesViewController: UIViewController {
         collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: layout)
         collectionView.backgroundColor = .background
         collectionView.register(EpisodesCellView.self, forCellWithReuseIdentifier: "episode")
-        collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(collectionView)
@@ -80,12 +87,6 @@ extension FavoritesViewController: EpisodesCellViewDelegate {
     
     func didTapFavoriteButton(in cell: EpisodesCellView) {
         guard let indexPath = collectionView.indexPath(for: cell) else { return }
-        let favorite = FavoritesManager.shared.favoriteEpisodes[indexPath.item]
-        
-        FavoritesManager.shared.removeFavorite(by: favorite.episode.id)
-        
-        collectionView.performBatchUpdates({
-            collectionView.deleteItems(at: [indexPath])
-        })
+        viewModel.removeFavorite(at: indexPath.item)
     }
 }

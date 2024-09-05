@@ -12,11 +12,12 @@ import Kingfisher
 class EpisodesViewController: UIViewController, UICollectionViewDelegate {
     private var collectionView: UICollectionView!
     private var cancellables = Set<AnyCancellable>()
-    private var viewModel: EpisodesViewModel
-    var coordinator: AppCoordinator?
-    
-    init(viewModel: EpisodesViewModel) {
+    var viewModel: EpisodesViewModel
+    var favoritesManager: FavoritesManager
+
+    init(viewModel: EpisodesViewModel, favoritesManager: FavoritesManager) {
         self.viewModel = viewModel
+        self.favoritesManager = favoritesManager
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -61,6 +62,12 @@ private extension EpisodesViewController {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
                 self?.collectionView.reloadData()
+            }
+            .store(in: &cancellables)
+        viewModel.$selectedEpisode
+            .compactMap { $0 }
+            .sink { episode, character in
+                print("tapped episode in general")
             }
             .store(in: &cancellables)
     }
@@ -116,7 +123,7 @@ extension EpisodesViewController: UICollectionViewDataSource, EpisodesCellViewDe
             return
         }
         let character = viewModel.episodeImages[indexPath.row]
-        let isFavorite = FavoritesManager.shared.isFavorite(episode.id)
+        let isFavorite = favoritesManager.isFavorite(episode.id)
         
         cell.characterName.text = character.name
         let url = URL(string: character.image)
@@ -145,16 +152,14 @@ extension EpisodesViewController: UICollectionViewDataSource, EpisodesCellViewDe
         )
         cell.characterName.text = placeholderCharacter.name
         cell.episodeImage.image = UIImage(named: "placeholder")
-        cell.configure(with: episode, with: placeholderCharacter, isFavorite: FavoritesManager.shared.isFavorite(episode.id))
+        cell.configure(with: episode, with: placeholderCharacter, isFavorite: favoritesManager.isFavorite(episode.id))
         cell.delegate = self
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if indexPath.section == 1 {
-            let episode = viewModel.episodes[indexPath.row]
-            guard indexPath.row < viewModel.episodeImages.count else { return }
-            let character = viewModel.episodeImages[indexPath.row]
-            coordinator?.showDetail(for: episode, character: character)
+
+            viewModel.didSelectEpisode(at: indexPath)
         }
     }
     
@@ -163,12 +168,12 @@ extension EpisodesViewController: UICollectionViewDataSource, EpisodesCellViewDe
             let selectedEpisode = viewModel.episodes[indexPath.row]
             let selectedCharacter = viewModel.episodeImages[indexPath.row]
             let favorite = FavoriteEpisodes(episode: selectedEpisode, character: selectedCharacter)
-            let isCurrentlyFavorite = FavoritesManager.shared.isFavorite(selectedEpisode.id)
+            let isCurrentlyFavorite = favoritesManager.isFavorite(selectedEpisode.id) // Используем экземпляр favoritesManager
             
             if isCurrentlyFavorite {
-                FavoritesManager.shared.removeFavorite(by: favorite.episode.id)
+                favoritesManager.removeFavorite(by: favorite.episode.id) // Используем экземпляр favoritesManager
             } else {
-                FavoritesManager.shared.addFavorite(favorite)
+                favoritesManager.addFavorite(favorite) // Используем экземпляр favoritesManager
                 showAlert(for: selectedCharacter)
             }
             cell.updateFavoriteButton(isFavorite: !isCurrentlyFavorite)
@@ -181,17 +186,6 @@ extension EpisodesViewController: UICollectionViewDataSource, EpisodesCellViewDe
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
     }
-    
-//    func collectionView(_ collectionView: UICollectionView, trailingSwipeAction indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-//        let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { [weak self] (action, view, completionHandler) in
-//            self?.deleteItem(at: indexPath)
-//            completionHandler(true)
-//        }
-//        
-//        let configuration = UISwipeActionsConfiguration(actions: [deleteAction])
-//        configuration.performsFirstActionWithFullSwipe = true
-//        return configuration
-//    }
     
     private func deleteItem(at indexPath: IndexPath) {
         viewModel.episodes.remove(at: indexPath.row)

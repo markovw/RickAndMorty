@@ -1,21 +1,21 @@
 import Foundation
-import UIKit
+import Combine
 
 class FavoritesManager {
-    static let shared = FavoritesManager()
-    
     private let favoritesKey = "favoriteEpisodes"
     
-    var favoriteEpisodes: [FavoriteEpisodes] {
-        get {
-            loadFavorites()
-        }
-        set {
-            saveFavorites(newValue)
-        }
-    }
+    @Published var favoriteEpisodes: [FavoriteEpisodes] = []
+    private var cancellables = Set<AnyCancellable>()
     
-    private init() {}
+    init() {
+        loadFavorites()
+        
+        $favoriteEpisodes
+            .sink { [weak self] episodes in
+                self?.saveFavorites(episodes)
+            }
+            .store(in: &cancellables)
+    }
     
     private func saveFavorites(_ episodes: [FavoriteEpisodes]) {
         let encoder = JSONEncoder()
@@ -24,14 +24,13 @@ class FavoritesManager {
         }
     }
     
-    private func loadFavorites() -> [FavoriteEpisodes] {
+    private func loadFavorites() {
         if let savedData = UserDefaults.standard.data(forKey: favoritesKey) {
             let decoder = JSONDecoder()
             if let loadedEpisodes = try? decoder.decode([FavoriteEpisodes].self, from: savedData) {
-                return loadedEpisodes
+                favoriteEpisodes = loadedEpisodes
             }
         }
-        return []
     }
     
     func addFavorite(_ favorite: FavoriteEpisodes) {

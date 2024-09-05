@@ -9,7 +9,7 @@ import UIKit
 
 extension FavoritesViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return FavoritesManager.shared.favoriteEpisodes.count
+        return viewModel.favoriteEpisodes.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -17,10 +17,10 @@ extension FavoritesViewController: UICollectionViewDataSource {
             fatalError("Unable to dequeue EpisodesCellView")
         }
         
-        let favorite = FavoritesManager.shared.favoriteEpisodes[indexPath.item]
+        let favorite = viewModel.favoriteEpisodes[indexPath.item]
         let episode = favorite.episode
         let character = favorite.character
-        let isFavorite = FavoritesManager.shared.isFavorite(episode.id)
+        let isFavorite = viewModel.isFavorite(episode.id)
         cell.configure(with: episode, with: character, isFavorite: isFavorite)
         
         if let characterURL = URL(string: character.image) {
@@ -42,7 +42,6 @@ extension FavoritesViewController: UICollectionViewDataSource {
 
 extension FavoritesViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let favorite = FavoritesManager.shared.favoriteEpisodes[indexPath.item]
-        coordinator?.showDetail(for: favorite.episode, character: favorite.character)
+        viewModel.didSelectFavorite(at: indexPath.item)
     }
 }

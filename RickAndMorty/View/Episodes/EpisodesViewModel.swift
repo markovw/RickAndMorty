@@ -12,13 +12,21 @@ import UIKit
 class EpisodesViewModel {
     @Published var episodes: [Result] = []
     @Published var episodeImages: [Character] = []
+    @Published var selectedEpisode: (episode: Result, character: Character)?
+    var cancellables = Set<AnyCancellable>()
     private var networkManager: NetworkManager
     private var characterFetcher: CharacterFetcher
-    var cancellables = Set<AnyCancellable>()
     
     init(networkManager: NetworkManager, characterFetcher: CharacterFetcher) {
         self.networkManager = networkManager
         self.characterFetcher = characterFetcher
+    }
+    
+    func didSelectEpisode(at indexPath: IndexPath) {
+        guard indexPath.row < episodes.count, indexPath.row < episodeImages.count else { return }
+        let episode = episodes[indexPath.row]
+        let character = episodeImages[indexPath.row]
+        selectedEpisode = (episode, character)
     }
     
     func loadEpisodes() {

@@ -13,10 +13,14 @@ final class AppCoordinator: Coordinator {
     
     let window: UIWindow
     private var tabBarCoordinator: TabBarCoordinator?
+    private let dependencies: IDependency
     
-    required init(window: UIWindow, _ navigationController: UINavigationController) {
+    required init(window: UIWindow,
+                  _ navigationController: UINavigationController,
+                  dependencies: IDependency) {
         self.window = window
         self.navigationController = navigationController
+        self.dependencies = dependencies
     }
     
     func start() {
@@ -33,7 +37,7 @@ final class AppCoordinator: Coordinator {
     }
     
     private func showMainApp() {
-        let tabBarCoordinator = TabBarCoordinator(navigationController, appCoordinator: self)
+        let tabBarCoordinator = TabBarCoordinator(navigationController, appCoordinator: self, dependencies: dependencies)
         self.tabBarCoordinator = tabBarCoordinator
         childCoordinators.append(tabBarCoordinator)
         tabBarCoordinator.start() 

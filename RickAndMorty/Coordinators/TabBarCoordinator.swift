@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Combine
 
 class TabBarCoordinator: Coordinator {
     
@@ -13,23 +14,26 @@ class TabBarCoordinator: Coordinator {
     internal var navigationController: UINavigationController
     var childCoordinators: [Coordinator] = []
     var appCoordinator: AppCoordinator?
+    private let dependencies: IDependency
+    private var cancellables = Set<AnyCancellable>()
     
-    init(_ navigationController: UINavigationController, appCoordinator: AppCoordinator) {
+    init(_ navigationController: UINavigationController,
+         appCoordinator: AppCoordinator,
+         dependencies: IDependency) {
         self.navigationController = navigationController
         self.tabBarController = UITabBarController()
         self.appCoordinator = appCoordinator
+        self.dependencies = dependencies
     }
     
     func start() {
-        let episodesViewController = Dependencies.shared.episodesViewController
-        episodesViewController.coordinator = appCoordinator
+        let episodesViewController = dependencies.moduleContainer.getEpisodesView()
         let espisodesNavController = UINavigationController(rootViewController: episodesViewController)
         episodesViewController.tabBarItem = UITabBarItem(title: "",
                                                          image: UIImage(systemName: "house"),
                                                          selectedImage: UIImage(systemName: "house.fill"))
         
-        let favoritesViewController = Dependencies.shared.favoritesViewController
-        favoritesViewController.coordinator = appCoordinator
+        let favoritesViewController = dependencies.moduleContainer.getFavoritesView()
         let favoritesNavController = UINavigationController(rootViewController: favoritesViewController)
         favoritesViewController.tabBarItem = UITabBarItem(title: "",
                                                           image: UIImage(systemName: "heart"),
@@ -40,5 +44,30 @@ class TabBarCoordinator: Coordinator {
         
         navigationController.setViewControllers([tabBarController], animated: true)
         navigationController.setNavigationBarHidden(true, animated: false)
+        
+        if let episodesVC = episodesViewController as? EpisodesViewController {
+            episodesVC.viewModel.$selectedEpisode
+                .compactMap { $0 }
+                .sink { [weak self] episode, character in
+                    self?.showDetail(for: episode, character: character)
+                }
+                .store(in: &cancellables)
+        }
+        
+        if let favoritesVC = favoritesViewController as? FavoritesViewController {
+            favoritesVC.viewModel.$selectedFavorite
+                .compactMap { $0 }
+                .sink { [weak self] episode, character in
+                    self?.showDetail(for: episode, character: character)
+                }
+                .store(in: &cancellables)
+        }
+    }
+    
+    func showDetail(for episode: Result, character: Character) {
+        let detailViewController = DetailViewController()
+        detailViewController.episode = episode
+        detailViewController.character = character
+        navigationController.pushViewController(detailViewController, animated: true)
     }
 }

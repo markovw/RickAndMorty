@@ -15,12 +15,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         if let windowScene = scene as? UIWindowScene {
             let window = UIWindow(windowScene: windowScene)
-            let applicationCoordinator = AppCoordinator(window: window, UINavigationController())
+            let dependencies = Dependencies()
+            
+            let applicationCoordinator = AppCoordinator(window: window, UINavigationController(), dependencies: dependencies)
             applicationCoordinator.start()
             self.appCoordinator = applicationCoordinator
             window.makeKeyAndVisible()
 
         }
     }
-
 }

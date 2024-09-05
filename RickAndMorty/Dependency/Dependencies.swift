@@ -8,24 +8,16 @@
 import Foundation
 
 protocol IDependency {
+    var moduleContainer: IModuleContainer { get }
     var networkManager: NetworkManager { get }
     var characterFetcher: CharacterFetcher { get }
+    var favoritesManager: FavoritesManager { get }
+
 }
 
 final class Dependencies: IDependency {
-    static let shared = Dependencies()
-    
+    lazy var favoritesManager: FavoritesManager = FavoritesManager()
+    lazy var moduleContainer: IModuleContainer = ModuleContainer(self)
     lazy var networkManager: NetworkManager = NetworkManager()
     lazy var characterFetcher: CharacterFetcher = CharacterFetcher()
-    lazy var episodesViewController: EpisodesViewController = EpisodesViewController(
-        viewModel: EpisodesViewModel(
-            networkManager: networkManager,
-            characterFetcher: characterFetcher
-        )
-    )
-    lazy var favoritesViewController: FavoritesViewController = FavoritesViewController(
-        viewModel: FavoritesViewModel(
-            favoritesManager: FavoritesManager.shared
-        )
-    )
 }
