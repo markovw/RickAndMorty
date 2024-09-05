@@ -8,7 +8,6 @@
 import UIKit
 
 final class DetailTableViewCell: UITableViewCell {
-    
     let titleLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.boldSystemFont(ofSize: 16)
@@ -36,7 +35,7 @@ final class DetailTableViewCell: UITableViewCell {
             titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 9),
             
             valueLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            valueLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
+            valueLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4)
         ])
     }
     

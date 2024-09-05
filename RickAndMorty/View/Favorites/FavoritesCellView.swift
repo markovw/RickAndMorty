@@ -46,4 +46,3 @@ extension FavoritesViewController: UICollectionViewDelegate {
         coordinator?.showDetail(for: favorite.episode, character: favorite.character)
     }
 }
-

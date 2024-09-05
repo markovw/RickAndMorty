@@ -21,14 +21,14 @@ class TabBarCoordinator: Coordinator {
     }
     
     func start() {
-        let episodesViewController = EpisodesViewController()
+        let episodesViewController = Dependencies.shared.episodesViewController
         episodesViewController.coordinator = appCoordinator
         let espisodesNavController = UINavigationController(rootViewController: episodesViewController)
         episodesViewController.tabBarItem = UITabBarItem(title: "",
                                                          image: UIImage(systemName: "house"),
                                                          selectedImage: UIImage(systemName: "house.fill"))
         
-        let favoritesViewController = FavoritesViewController()
+        let favoritesViewController = Dependencies.shared.favoritesViewController
         favoritesViewController.coordinator = appCoordinator
         let favoritesNavController = UINavigationController(rootViewController: favoritesViewController)
         favoritesViewController.tabBarItem = UITabBarItem(title: "",
@@ -42,4 +42,3 @@ class TabBarCoordinator: Coordinator {
         navigationController.setNavigationBarHidden(true, animated: false)
     }
 }
-

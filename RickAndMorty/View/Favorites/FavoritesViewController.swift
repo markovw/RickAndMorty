@@ -10,8 +10,17 @@ import Kingfisher
 
 class FavoritesViewController: UIViewController {
     private var collectionView: UICollectionView!
-    private lazy var favorites: [FavoriteEpisodes] = []
+    private var viewModel: FavoritesViewModel
     var coordinator: AppCoordinator?
+    
+    init(viewModel: FavoritesViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     let titleLabel: UILabel = {
         let label = UILabel()
@@ -80,6 +89,3 @@ extension FavoritesViewController: EpisodesCellViewDelegate {
         })
     }
 }
-
-
-

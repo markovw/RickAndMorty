@@ -11,20 +11,20 @@ import UIKit
 final class EpisodesHeaderView: UICollectionViewCell {
     let logoImageView = UIImageView()
     let searchTextField: UITextField = {
-        let tf = UITextField()
-        tf.backgroundColor = .white
-        tf.textColor = .textButton
-        tf.layer.borderWidth = 1
-        tf.leftImage(.magnifyingGlass.resize(to: CGSize(width: 24, height: 24)), imageWidth: 8, padding: 18)
-        tf.layer.borderColor = UIColor.darkGray.cgColor
-        tf.layer.cornerRadius = 10
-        tf.layer.masksToBounds = true
-        tf.attributedPlaceholder = NSAttributedString(
+        let textField = UITextField()
+        textField.backgroundColor = .white
+        textField.textColor = .textButton
+        textField.layer.borderWidth = 1
+        textField.leftImage(.magnifyingGlass.resize(to: CGSize(width: 24, height: 24)), imageWidth: 8, padding: 18)
+        textField.layer.borderColor = UIColor.darkGray.cgColor
+        textField.layer.cornerRadius = 10
+        textField.layer.masksToBounds = true
+        textField.attributedPlaceholder = NSAttributedString(
             string: "Name or episode (ex.S01E01)...",
             attributes: [NSAttributedString.Key.foregroundColor: UIColor.darkGray]
         )
-        tf.translatesAutoresizingMaskIntoConstraints = false
-        return tf
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        return textField
     }()
     let filterButton: UIButton = {
         let filterButton = UIButton(type: .system)

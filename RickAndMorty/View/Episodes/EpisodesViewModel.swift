@@ -12,9 +12,14 @@ import UIKit
 class EpisodesViewModel {
     @Published var episodes: [Result] = []
     @Published var episodeImages: [Character] = []
-    private var networkManager: NetworkManager = NetworkManager()
-    private var characterFetcher: CharacterFetcher = CharacterFetcher()
+    private var networkManager: NetworkManager
+    private var characterFetcher: CharacterFetcher
     var cancellables = Set<AnyCancellable>()
+    
+    init(networkManager: NetworkManager, characterFetcher: CharacterFetcher) {
+        self.networkManager = networkManager
+        self.characterFetcher = characterFetcher
+    }
     
     func loadEpisodes() {
         networkManager.loadData()

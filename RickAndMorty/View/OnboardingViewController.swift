@@ -74,4 +74,3 @@ class OnboardingViewController: UIViewController {
         portalImage.layer.add(animationGroup, forKey: "rotateAndScaleAnimation")
     }
 }
-

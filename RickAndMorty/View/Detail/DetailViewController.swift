@@ -131,7 +131,7 @@ class DetailViewController: UIViewController, UITableViewDelegate, UITableViewDa
             "Gender": character.gender,
             "Status": character.status,
             "Specie": character.species,
-            "Origin": character.origin.name.contains("unknown") ? "Unknown" : character.origin.name ,
+            "Origin": character.origin.name.contains("unknown") ? "Unknown" : character.origin.name,
             "Type": character.type.isEmpty ? "Unknown" : character.type,
             "Location": character.location.name
         ]
@@ -249,10 +249,12 @@ extension DetailViewController {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "InfoCell", for: indexPath) as! DetailTableViewCell
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "InfoCell", for: indexPath) as? DetailTableViewCell else {
+            fatalError("Dequeued cell is not of type DetailTableViewCell")
+        }
         let key = data[indexPath.section]
         let value = dataDictionary[key] ?? "N/A"
-
+        
         cell.titleLabel.text = key
         cell.valueLabel.text = value
         
@@ -268,7 +270,7 @@ extension DetailViewController {
 }
 
 extension DetailViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
         if let pickedImage = info[.originalImage] as? UIImage {
             circularImageView.image = pickedImage
         }

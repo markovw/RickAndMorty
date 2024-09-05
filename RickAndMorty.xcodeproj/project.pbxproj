@@ -85,6 +85,7 @@
 				86E2C2652C790DE300DC4E60 /* Sources */,
 				86E2C2662C790DE300DC4E60 /* Frameworks */,
 				86E2C2672C790DE300DC4E60 /* Resources */,
+				86F2A5072C89AD4C00C8250F /* SwiftLint */,
 			);
 			buildRules = (
 			);
@@ -127,6 +128,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				86F27FA22C79FEC500C70E57 /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				86F2A5062C89AC4E00C8250F /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 86E2C26A2C790DE300DC4E60 /* Products */;
@@ -147,6 +149,27 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		86F2A5072C89AD4C00C8250F /* SwiftLint */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = SwiftLint;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "SWIFT_PACKAGE_DIR=\"${BUILD_DIR%Build/*}SourcePackages/artifacts\"\nSWIFTLINT_CMD=$(ls \"$SWIFT_PACKAGE_DIR\"/swiftlintplugins/SwiftLintBinary/SwiftLintBinary.artifactbundle/swiftlint-*/bin/swiftlint | head -n 1)\n\nif test -f \"$SWIFTLINT_CMD\" 2>&1\nthen\n    \"$SWIFTLINT_CMD\"\nelse\n    echo \"warning: `swiftlint` command not found - See https://github.com/realm/SwiftLint#installation for installation instructions.\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		86E2C2652C790DE300DC4E60 /* Sources */ = {
@@ -366,6 +389,14 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 7.12.0;
+			};
+		};
+		86F2A5062C89AC4E00C8250F /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SimplyDanny/SwiftLintPlugins";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.56.2;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

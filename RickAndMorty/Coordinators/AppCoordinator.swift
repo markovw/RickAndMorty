@@ -36,7 +36,7 @@ final class AppCoordinator: Coordinator {
         let tabBarCoordinator = TabBarCoordinator(navigationController, appCoordinator: self)
         self.tabBarCoordinator = tabBarCoordinator
         childCoordinators.append(tabBarCoordinator)
-        tabBarCoordinator.start()
+        tabBarCoordinator.start() 
     }
     
     func showDetail(for episode: Result, character: Character) {
@@ -47,6 +47,3 @@ final class AppCoordinator: Coordinator {
         navigationController.interactivePopGestureRecognizer?.isEnabled = true
     }
 }
-
-
-
