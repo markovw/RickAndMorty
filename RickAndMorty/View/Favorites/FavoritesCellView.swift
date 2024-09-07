@@ -21,7 +21,7 @@ extension FavoritesViewController: UICollectionViewDataSource {
         let episode = favorite.episode
         let character = favorite.character
         let isFavorite = viewModel.isFavorite(episode.id)
-        cell.configure(with: episode, with: character, isFavorite: isFavorite)
+        cell.configure(with: episode, character: character, isFavorite: isFavorite)
         
         if let characterURL = URL(string: character.image) {
             cell.episodeImage.kf.setImage(

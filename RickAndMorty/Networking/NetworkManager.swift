@@ -37,10 +37,10 @@ final class NetworkManager {
     }
 }
 
-final class CharacterFetcher {
+final class CharacterFetchService {
     private var cancellables = Set<AnyCancellable>()
     
-    func fetchRandomCharacterImage(for characterURL: [String]) -> AnyPublisher<Character, Error> {
+    func fetchCharacterImage(for characterURL: [String]) -> AnyPublisher<Character, Error> {
         guard let randomCharacterURL = characterURL.randomElement(),
               let url = URL(string: randomCharacterURL) else {
             return Fail(error: NetworkError.invalidURL).eraseToAnyPublisher()

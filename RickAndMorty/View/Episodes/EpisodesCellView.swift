@@ -9,7 +9,7 @@ import UIKit
 import Combine
 
 final class EpisodesCellView: UICollectionViewCell, UICollectionViewDelegate {
-    var episode: Result?
+    var episode: EpisodeDTO?
     private var cancellables = Set<AnyCancellable>()
     weak var delegate: EpisodesCellViewDelegate?
     
@@ -23,13 +23,13 @@ final class EpisodesCellView: UICollectionViewCell, UICollectionViewDelegate {
         imageView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         return imageView
     }()
-    let episodeIcon: UIImageView = {
+    private let episodeIcon: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
-    let heartButton: UIButton = {
+    private let heartButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(named: "heartIcon"), for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -44,7 +44,7 @@ final class EpisodesCellView: UICollectionViewCell, UICollectionViewDelegate {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    let episodeTitle: UILabel = {
+    private let episodeTitle: UILabel = {
         let label = UILabel()
         label.textAlignment = .left
         label.font = .systemFont(ofSize: 16)
@@ -100,12 +100,22 @@ final class EpisodesCellView: UICollectionViewCell, UICollectionViewDelegate {
     }
     
     // MARK: Configure Favorites View
-    func configure(with episode: Result, with character: Character, isFavorite: Bool) {
+    func configure(with episode: Result, character: Character, isFavorite: Bool) {
         episodeIcon.image = UIImage(named: "playIcon")
         episodeTitle.text = "\(episode.name) | \(episode.episode)"
         characterName.text = character.name
+        
+        let url = URL(string: character.image)
+        episodeImage.kf.setImage(
+            with: url,
+            placeholder: UIImage(named: "placeholder"),
+            options: [
+                .transition(.fade(0.2)),
+                .cacheOriginalImage
+            ]
+        )
+        
         updateFavoriteButton(isFavorite: isFavorite)
-
     }
     
     func updateFavoriteButton(isFavorite: Bool) {

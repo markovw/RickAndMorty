@@ -7,6 +7,21 @@
 
 import Foundation
 
+struct EpisodeDTO {
+    let id: Int
+    let name: String
+    let airDate: String
+    let episode: String
+    let characterName: String
+    let characterImage: String
+    let characterStatus: String
+    let characterSpecies: String
+    let characterGender: String
+    let characterLocation: String
+    let characterOrigin: String
+    let characterType: String
+}
+
 struct Info: Codable {
     let count: Int
     let pages: Int
@@ -28,6 +43,8 @@ struct Result: Codable, Identifiable {
         case episode, characters, url, created
     }
 }
+
+
 
 struct Location: Codable {
     let name: String
@@ -51,4 +68,22 @@ struct Character: Codable {
 struct EpisodeResponse: Codable {
     let info: Info
     let results: [Result]
+}
+
+extension EpisodeDTO {
+    init(from result: Result, character: Character) {
+        self.id = result.id
+        self.name = result.name
+        self.airDate = result.airDate
+        self.episode = result.episode
+        self.characterName = character.name
+        self.characterImage = character.image
+        self.characterStatus = character.status
+        self.characterSpecies = character.species
+        self.characterGender = character.gender
+        self.characterLocation = character.location.name
+        self.characterOrigin = character.origin.name
+        self.characterType = character.type
+
+    }
 }

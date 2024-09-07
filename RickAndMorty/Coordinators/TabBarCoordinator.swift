@@ -9,7 +9,6 @@ import UIKit
 import Combine
 
 class TabBarCoordinator: Coordinator {
-    
     private let tabBarController: UITabBarController
     internal var navigationController: UINavigationController
     var childCoordinators: [Coordinator] = []

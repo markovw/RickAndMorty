@@ -15,11 +15,11 @@ class EpisodesViewModel {
     @Published var selectedEpisode: (episode: Result, character: Character)?
     var cancellables = Set<AnyCancellable>()
     private var networkManager: NetworkManager
-    private var characterFetcher: CharacterFetcher
+    private var characterFetchService: CharacterFetchService
     
-    init(networkManager: NetworkManager, characterFetcher: CharacterFetcher) {
+    init(networkManager: NetworkManager, characterFetchService: CharacterFetchService) {
         self.networkManager = networkManager
-        self.characterFetcher = characterFetcher
+        self.characterFetchService = characterFetchService
     }
     
     func didSelectEpisode(at indexPath: IndexPath) {
@@ -48,7 +48,7 @@ class EpisodesViewModel {
     
     private func fetchCharacterInfo() {
         for episode in episodes {
-            characterFetcher.fetchRandomCharacterImage(for: episode.characters)
+            characterFetchService.fetchCharacterImage(for: episode.characters)
                 .sink { completion in
                     switch completion {
                     case .finished:

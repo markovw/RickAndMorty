@@ -11,7 +11,7 @@ import Combine
 
 class FavoritesViewController: UIViewController {
     private var collectionView: UICollectionView!
-    private var cancellables = Set<AnyCancellable>()
+    private lazy var cancellables = Set<AnyCancellable>()
     var viewModel: FavoritesViewModel
     
     init(viewModel: FavoritesViewModel) {
@@ -23,7 +23,7 @@ class FavoritesViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    let titleLabel: UILabel = {
+    private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Favorites episodes"
         label.font = UIFont.boldSystemFont(ofSize: 24)

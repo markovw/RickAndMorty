@@ -34,10 +34,11 @@ extension ModuleContainer {
 extension ModuleContainer {
     func getEpisodesView() -> UIViewController {
         let favoritesManager = dependencies.favoritesManager
+        let favoritesViewModel = dependencies.favoritesViewModel
         let networkManager = dependencies.networkManager
-        let characterFetcher = dependencies.characterFetcher
-        let viewModel = EpisodesViewModel(networkManager: networkManager, characterFetcher: characterFetcher)
-        let view = EpisodesViewController(viewModel: viewModel, favoritesManager: favoritesManager)
+        let characterFetchService = dependencies.characterFetchService
+        let viewModel = EpisodesViewModel(networkManager: networkManager, characterFetchService: characterFetchService)
+        let view = EpisodesViewController(viewModel: viewModel, favoritesManager: favoritesManager, favoritesViewModel: favoritesViewModel)
         return view
     }
 }

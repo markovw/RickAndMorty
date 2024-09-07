@@ -11,7 +11,7 @@ import Combine
 class FavoritesViewModel {
     @Published var favoriteEpisodes: [FavoriteEpisodes] = []
     @Published var selectedFavorite: (episode: Result, character: Character)?
-    private var cancellables = Set<AnyCancellable>()
+    private lazy var cancellables = Set<AnyCancellable>()
     private let favoritesManager: FavoritesManager
     
     init(favoritesManager: FavoritesManager) {
@@ -23,6 +23,19 @@ class FavoritesViewModel {
                 self?.favoriteEpisodes = episodes
             }
             .store(in: &cancellables)
+    }
+    
+    func toggleFavorite(episode: Result, character: Character) -> Bool {
+        let favorite = FavoriteEpisodes(episode: episode, character: character)
+        let isCurrentlyFavorite = favoritesManager.isFavorite(episode.id)
+        
+        if isCurrentlyFavorite {
+            favoritesManager.removeFavorite(by: episode.id)
+        } else {
+            favoritesManager.addFavorite(favorite)
+        }
+        
+        return !isCurrentlyFavorite
     }
     
     func removeFavorite(at index: Int) {

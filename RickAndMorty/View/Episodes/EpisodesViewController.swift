@@ -12,11 +12,13 @@ import Kingfisher
 class EpisodesViewController: UIViewController, UICollectionViewDelegate {
     private var collectionView: UICollectionView!
     private var cancellables = Set<AnyCancellable>()
+    private var favoritesManager: FavoritesManager
     var viewModel: EpisodesViewModel
-    var favoritesManager: FavoritesManager
+    var favoritesViewModel: FavoritesViewModel
 
-    init(viewModel: EpisodesViewModel, favoritesManager: FavoritesManager) {
+    init(viewModel: EpisodesViewModel, favoritesManager: FavoritesManager, favoritesViewModel: FavoritesViewModel) {
         self.viewModel = viewModel
+        self.favoritesViewModel = favoritesViewModel
         self.favoritesManager = favoritesManager
         super.init(nibName: nil, bundle: nil)
     }
@@ -111,9 +113,7 @@ extension EpisodesViewController: UICollectionViewDataSource, EpisodesCellViewDe
     }
     
     private func configureHeaderCell(_ cell: EpisodesHeaderView) {
-        cell.logoImageView.image = UIImage(named: "logoImage")
-        cell.searchTextField.placeholder = "Name or episode (ex. S01E01)"
-        cell.filterButton.setTitle("ADVANCED FILTERS", for: .normal)
+        cell.configure()
     }
     
     private func configureEpisodeCell(_ cell: EpisodesCellView, at indexPath: IndexPath) {
@@ -125,17 +125,7 @@ extension EpisodesViewController: UICollectionViewDataSource, EpisodesCellViewDe
         let character = viewModel.episodeImages[indexPath.row]
         let isFavorite = favoritesManager.isFavorite(episode.id)
         
-        cell.characterName.text = character.name
-        let url = URL(string: character.image)
-        cell.episodeImage.kf.setImage(
-            with: url,
-            placeholder: UIImage(named: "placeholder"),
-            options: [
-                .transition(.fade(0.2)),
-                .cacheOriginalImage
-            ]
-        )
-        cell.configure(with: episode, with: character, isFavorite: isFavorite)
+        cell.configure(with: episode, character: character, isFavorite: isFavorite)
         cell.delegate = self
     }
     
@@ -150,15 +140,13 @@ extension EpisodesViewController: UICollectionViewDataSource, EpisodesCellViewDe
             origin: Origin(name: "Unknown"),
             type: "Loading.."
         )
-        cell.characterName.text = placeholderCharacter.name
-        cell.episodeImage.image = UIImage(named: "placeholder")
-        cell.configure(with: episode, with: placeholderCharacter, isFavorite: favoritesManager.isFavorite(episode.id))
+        cell.configure(with: episode, character: placeholderCharacter,
+                       isFavorite: favoritesManager.isFavorite(episode.id))
         cell.delegate = self
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if indexPath.section == 1 {
-
             viewModel.didSelectEpisode(at: indexPath)
         }
     }
@@ -167,24 +155,10 @@ extension EpisodesViewController: UICollectionViewDataSource, EpisodesCellViewDe
         if let indexPath = collectionView.indexPath(for: cell) {
             let selectedEpisode = viewModel.episodes[indexPath.row]
             let selectedCharacter = viewModel.episodeImages[indexPath.row]
-            let favorite = FavoriteEpisodes(episode: selectedEpisode, character: selectedCharacter)
-            let isCurrentlyFavorite = favoritesManager.isFavorite(selectedEpisode.id) // Используем экземпляр favoritesManager
-            
-            if isCurrentlyFavorite {
-                favoritesManager.removeFavorite(by: favorite.episode.id) // Используем экземпляр favoritesManager
-            } else {
-                favoritesManager.addFavorite(favorite) // Используем экземпляр favoritesManager
-                showAlert(for: selectedCharacter)
-            }
-            cell.updateFavoriteButton(isFavorite: !isCurrentlyFavorite)
+            let isFavorite = favoritesViewModel.toggleFavorite(episode: selectedEpisode, character: selectedCharacter)
+            cell.updateFavoriteButton(isFavorite: isFavorite)
             collectionView.reloadData()
         }
-    }
-    
-    private func showAlert(for character: Character) {
-        let alert = UIAlertController(title: "Success", message: "Added \(character.name) to Favorites!", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
-        present(alert, animated: true)
     }
     
     private func deleteItem(at indexPath: IndexPath) {

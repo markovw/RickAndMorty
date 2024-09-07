@@ -9,8 +9,8 @@ import Foundation
 import UIKit
 
 final class EpisodesHeaderView: UICollectionViewCell {
-    let logoImageView = UIImageView()
-    let searchTextField: UITextField = {
+    private let logoImageView = UIImageView()
+    private let searchTextField: UITextField = {
         let textField = UITextField()
         textField.backgroundColor = .white
         textField.textColor = .textButton
@@ -26,7 +26,7 @@ final class EpisodesHeaderView: UICollectionViewCell {
         textField.translatesAutoresizingMaskIntoConstraints = false
         return textField
     }()
-    let filterButton: UIButton = {
+    private let filterButton: UIButton = {
         let filterButton = UIButton(type: .system)
         filterButton.setTitle("ADVANCED FILTERS", for: .normal)
         filterButton.tintColor = .textButton
@@ -70,4 +70,11 @@ final class EpisodesHeaderView: UICollectionViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    func configure() {
+        logoImageView.image = UIImage(named: "logoImage")
+        searchTextField.placeholder = "Name or episode (ex. S01E01)"
+        filterButton.setTitle("ADVANCED FILTERS", for: .normal)
+    }
+    
 }

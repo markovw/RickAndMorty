@@ -10,14 +10,16 @@ import Foundation
 protocol IDependency {
     var moduleContainer: IModuleContainer { get }
     var networkManager: NetworkManager { get }
-    var characterFetcher: CharacterFetcher { get }
+    var characterFetchService: CharacterFetchService { get }
     var favoritesManager: FavoritesManager { get }
+    var favoritesViewModel: FavoritesViewModel { get }
 
 }
 
 final class Dependencies: IDependency {
+    lazy var favoritesViewModel: FavoritesViewModel = FavoritesViewModel(favoritesManager: favoritesManager)
     lazy var favoritesManager: FavoritesManager = FavoritesManager()
     lazy var moduleContainer: IModuleContainer = ModuleContainer(self)
     lazy var networkManager: NetworkManager = NetworkManager()
-    lazy var characterFetcher: CharacterFetcher = CharacterFetcher()
+    lazy var characterFetchService: CharacterFetchService = CharacterFetchService()
 }
