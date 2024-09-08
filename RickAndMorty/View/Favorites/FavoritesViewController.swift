@@ -46,7 +46,7 @@ class FavoritesViewController: UIViewController {
             .store(in: &cancellables)
         viewModel.$selectedFavorite
             .compactMap { $0 }
-            .sink { episode, character in
+            .sink { _ in
                 print("tapped esisode in favorites")
             }
             .store(in: &cancellables)

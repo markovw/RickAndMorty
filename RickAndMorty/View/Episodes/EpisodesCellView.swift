@@ -6,11 +6,8 @@
 //
 
 import UIKit
-import Combine
 
 final class EpisodesCellView: UICollectionViewCell, UICollectionViewDelegate {
-    var episode: EpisodeDTO?
-    private var cancellables = Set<AnyCancellable>()
     weak var delegate: EpisodesCellViewDelegate?
     
     let episodeImage: UIImageView = {
@@ -114,7 +111,6 @@ final class EpisodesCellView: UICollectionViewCell, UICollectionViewDelegate {
                 .cacheOriginalImage
             ]
         )
-        
         updateFavoriteButton(isFavorite: isFavorite)
     }
     

@@ -15,7 +15,7 @@ class EpisodesViewController: UIViewController, UICollectionViewDelegate {
     private var favoritesManager: FavoritesManager
     var viewModel: EpisodesViewModel
     var favoritesViewModel: FavoritesViewModel
-
+    
     init(viewModel: EpisodesViewModel, favoritesManager: FavoritesManager, favoritesViewModel: FavoritesViewModel) {
         self.viewModel = viewModel
         self.favoritesViewModel = favoritesViewModel
@@ -49,7 +49,7 @@ private extension EpisodesViewController {
         layout.scrollDirection = .vertical
         layout.minimumInteritemSpacing = 55
         layout.minimumLineSpacing = 55
-        collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: layout)
+        collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .background
         collectionView.register(EpisodesCellView.self, forCellWithReuseIdentifier: "episode")
         collectionView.register(EpisodesHeaderView.self, forCellWithReuseIdentifier: "headerCell")
@@ -57,37 +57,63 @@ private extension EpisodesViewController {
         collectionView.dataSource = self
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(collectionView)
+        
+        NSLayoutConstraint.activate([
+            collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            collectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        ])
     }
     
     private func bindViewModel() {
         viewModel.$episodes
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-                self?.collectionView.reloadData()
+                self?.collectionView.reloadSections(IndexSet(integer: Section.episodes.rawValue))
             }
             .store(in: &cancellables)
         viewModel.$selectedEpisode
             .compactMap { $0 }
-            .sink { episode, character in
+            .sink { _ in
                 print("tapped episode in general")
+                self.collectionView.reloadData()
             }
             .store(in: &cancellables)
     }
 }
 
 extension EpisodesViewController: UICollectionViewDataSource, EpisodesCellViewDelegate {
+    private enum Section: Int {
+        case header
+        case episodes
+    }
+    
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 2
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return section == 0 ? 1 : viewModel.episodes.count
+        guard let section = Section(rawValue: section) else { return 0 }
+        switch section {
+        case .header:
+            return 1
+        case .episodes:
+            return viewModel.episodes.count
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        return indexPath.section == 0
-        ? dequeueHeaderCell(for: indexPath)
-        : dequeueEpisodeCell(for: indexPath)
+        guard let section = Section(rawValue: indexPath.section) else {
+            fatalError("Unknown section")
+        }
+        
+        switch section {
+        case .header:
+            return dequeueHeaderCell(for: indexPath)
+        case .episodes:
+            return dequeueEpisodeCell(for: indexPath)
+        }
     }
     
     private func dequeueHeaderCell(for indexPath: IndexPath) -> UICollectionViewCell {
@@ -113,7 +139,7 @@ extension EpisodesViewController: UICollectionViewDataSource, EpisodesCellViewDe
     }
     
     private func configureHeaderCell(_ cell: EpisodesHeaderView) {
-        cell.configure()
+        cell.configure(with: viewModel)
     }
     
     private func configureEpisodeCell(_ cell: EpisodesCellView, at indexPath: IndexPath) {
@@ -146,7 +172,12 @@ extension EpisodesViewController: UICollectionViewDataSource, EpisodesCellViewDe
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if indexPath.section == 1 {
+        guard let section = Section(rawValue: indexPath.section) else { return }
+        
+        switch section {
+        case .header:
+            break
+        case .episodes:
             viewModel.didSelectEpisode(at: indexPath)
         }
     }

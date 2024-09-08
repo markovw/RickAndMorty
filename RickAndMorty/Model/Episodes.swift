@@ -44,8 +44,6 @@ struct Result: Codable, Identifiable {
     }
 }
 
-
-
 struct Location: Codable {
     let name: String
 }

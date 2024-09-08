@@ -9,13 +9,16 @@ import Foundation
 import UIKit
 
 final class EpisodesHeaderView: UICollectionViewCell {
+    var viewModel: EpisodesViewModel?
+    
     private let logoImageView = UIImageView()
     private let searchTextField: UITextField = {
         let textField = UITextField()
         textField.backgroundColor = .white
         textField.textColor = .textButton
         textField.layer.borderWidth = 1
-        textField.leftImage(.magnifyingGlass.resize(to: CGSize(width: 24, height: 24)), imageWidth: 8, padding: 18)
+        textField.leftImage(.magnifyingGlass.resize(to: CGSize(width: 24, height: 24)),
+                            imageWidth: 8, padding: 18)
         textField.layer.borderColor = UIColor.darkGray.cgColor
         textField.layer.cornerRadius = 10
         textField.layer.masksToBounds = true
@@ -24,6 +27,8 @@ final class EpisodesHeaderView: UICollectionViewCell {
             attributes: [NSAttributedString.Key.foregroundColor: UIColor.darkGray]
         )
         textField.translatesAutoresizingMaskIntoConstraints = false
+        textField.autocorrectionType = .no
+        textField.addTarget(self, action: #selector(searchTextFieldDidChange(_:)), for: .editingChanged)
         return textField
     }()
     private let filterButton: UIButton = {
@@ -71,10 +76,16 @@ final class EpisodesHeaderView: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configure() {
+    func configure(with viewModel: EpisodesViewModel) {
+        self.viewModel = viewModel
         logoImageView.image = UIImage(named: "logoImage")
         searchTextField.placeholder = "Name or episode (ex. S01E01)"
         filterButton.setTitle("ADVANCED FILTERS", for: .normal)
+    }
+    
+    @objc private func searchTextFieldDidChange(_ textField: UITextField) {
+        guard let text = textField.text else { return }
+        viewModel?.searchText = text
     }
     
 }
