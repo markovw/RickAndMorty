@@ -8,11 +8,11 @@
 import Foundation
 import UIKit
 
-final class EpisodesHeaderView: UICollectionViewCell {
+final class EpisodesHeaderView: UICollectionViewCell, UITextFieldDelegate {
     var viewModel: EpisodesViewModel?
     
     private let logoImageView = UIImageView()
-    private let searchTextField: UITextField = {
+    private lazy var searchTextField: UITextField = {
         let textField = UITextField()
         textField.backgroundColor = .white
         textField.textColor = .textButton
@@ -54,7 +54,8 @@ final class EpisodesHeaderView: UICollectionViewCell {
         logoImageView.translatesAutoresizingMaskIntoConstraints = false
         searchTextField.translatesAutoresizingMaskIntoConstraints = false
         filterButton.translatesAutoresizingMaskIntoConstraints = false
-        
+        searchTextField.delegate = self
+
         NSLayoutConstraint.activate([
             // logo
             logoImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20),
@@ -83,9 +84,14 @@ final class EpisodesHeaderView: UICollectionViewCell {
         filterButton.setTitle("ADVANCED FILTERS", for: .normal)
     }
     
+    // MARK: – TextField Actions
     @objc private func searchTextFieldDidChange(_ textField: UITextField) {
         guard let text = textField.text else { return }
         viewModel?.searchText = text
     }
     
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        searchTextField.resignFirstResponder()
+        return true
+    }
 }

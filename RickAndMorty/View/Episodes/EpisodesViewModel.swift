@@ -15,16 +15,33 @@ class EpisodesViewModel {
     @Published var selectedEpisode: (episode: Result, character: Character)?
     @Published var searchText: String = "" {
         didSet {
-            filterEpisodes()
+            searchTextPublisher.send(searchText)
         }
     }
-    
+    private var searchTextPublisher = PassthroughSubject<String, Never>()
     private var cancellables = Set<AnyCancellable>()
     private var networkManager: NetworkManager
     private var characterFetchService: CharacterFetchService
     
     private var allEpisodes: [Result] = []
     private var allEpisodeImages: [Character] = []
+    
+    init(networkManager: NetworkManager, characterFetchService: CharacterFetchService) {
+        self.networkManager = networkManager
+        self.characterFetchService = characterFetchService
+        setupBindings()
+    }
+    
+    private func setupBindings() {
+        searchTextPublisher
+            .debounce(for: .milliseconds(350), scheduler: DispatchQueue.main)
+            .removeDuplicates()
+            .sink { [weak self] text in
+                self?.searchText = text
+                self?.filterEpisodes()
+            }
+            .store(in: &cancellables)
+    }
     
     private func filterEpisodes() {
         if searchText.isEmpty {
@@ -41,11 +58,6 @@ class EpisodesViewModel {
             episodes = filteredIndices.map { allEpisodes[$0] }
             episodeImages = filteredIndices.map { allEpisodeImages[$0] }
         }
-    }
-    
-    init(networkManager: NetworkManager, characterFetchService: CharacterFetchService) {
-        self.networkManager = networkManager
-        self.characterFetchService = characterFetchService
     }
     
     func didSelectEpisode(at indexPath: IndexPath) {

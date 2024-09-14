@@ -13,7 +13,6 @@ protocol IDependency {
     var characterFetchService: CharacterFetchService { get }
     var favoritesManager: FavoritesManager { get }
     var favoritesViewModel: FavoritesViewModel { get }
-
 }
 
 final class Dependencies: IDependency {
